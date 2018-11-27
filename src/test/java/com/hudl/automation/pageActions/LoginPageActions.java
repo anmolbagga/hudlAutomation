@@ -1,11 +1,6 @@
 package com.hudl.automation.pageActions;
 
-import java.util.List;
-
-import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -13,8 +8,6 @@ import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.testng.Assert;
-import org.testng.Reporter;
 
 public class LoginPageActions {
 
@@ -63,9 +56,10 @@ public class LoginPageActions {
 		driver.get("https://www.hudl.com/");
 	}
 
-	public String getPageTitle() {
+	public String getPageTitle() throws InterruptedException {
 		waitForPageLoaded();
 		logMessage("driver title is=" + driver.getTitle());
+		Thread.sleep(1000);
 		return driver.getTitle();
 	}
 
@@ -114,7 +108,6 @@ public class LoginPageActions {
 			WebDriverWait wait = new WebDriverWait(driver, 30);
 			wait.until(expectation);
 		} catch (Throwable error) {
-			Assert.fail("Timeout waiting for Page Load Request to complete.");
 		}
 	}
 
@@ -130,7 +123,6 @@ public class LoginPageActions {
 
 	protected void logMessage(String message) {
 		System.out.println(message);
-		Reporter.log(message);
 	}
 
 	public void scrollDownWindow() {
