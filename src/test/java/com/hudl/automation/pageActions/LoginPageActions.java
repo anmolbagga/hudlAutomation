@@ -13,6 +13,7 @@ import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
 import org.testng.Reporter;
 
 public class LoginPageActions {
@@ -62,7 +63,8 @@ public class LoginPageActions {
 		driver.get("https://www.hudl.com/");
 	}
 
-	public String getHudlLoginPageTitle() {
+	public String getPageTitle() {
+		waitForPageLoaded();
 		logMessage("driver title is=" + driver.getTitle());
 		return driver.getTitle();
 	}
@@ -82,25 +84,52 @@ public class LoginPageActions {
 	public void clickLoginButton() {
 		loginButtonToLogin.click();
 	}
-	
+
 	public void enterCredentialsAndLogin(String Username, String Password) {
 		enterUserName(Username);
 		enterPassword(Password);
 		clickLoginButton();
 	}
-	
+
 	public String getErrorMessage() {
 		waitForElementToload(needHelpLink);
-		System.out.println("error message is "+needHelpLink.getText());
+		System.out.println("error message is " + needHelpLink.getText());
 		return needHelpLink.getText();
 	}
-	
+
 	public WebElement waitForElementToload(WebElement element) {
 		WebDriverWait wait = new WebDriverWait(driver, 10);
 		return wait.until(ExpectedConditions.visibilityOf(element));
 	}
 
+	public void waitForPageLoaded() {
+		ExpectedCondition<Boolean> expectation = new ExpectedCondition<Boolean>() {
+			public Boolean apply(WebDriver driver) {
+				return ((JavascriptExecutor) driver).executeScript("return document.readyState").toString()
+						.equals("complete");
+			}
+		};
+		try {
+			Thread.sleep(1000);
+			WebDriverWait wait = new WebDriverWait(driver, 30);
+			wait.until(expectation);
+		} catch (Throwable error) {
+			Assert.fail("Timeout waiting for Page Load Request to complete.");
+		}
+	}
+
+	public void waitForLoad(WebDriver driver) {
+		ExpectedCondition<Boolean> pageLoadCondition = new ExpectedCondition<Boolean>() {
+			public Boolean apply(WebDriver driver) {
+				return ((JavascriptExecutor) driver).executeScript("return document.readyState").equals("complete");
+			}
+		};
+		WebDriverWait wait = new WebDriverWait(driver, 10);
+		wait.until(pageLoadCondition);
+	}
+
 	protected void logMessage(String message) {
+		System.out.println(message);
 		Reporter.log(message);
 	}
 
