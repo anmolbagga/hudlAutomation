@@ -13,7 +13,7 @@ import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
+import org.testng.Reporter;
 
 public class LoginPageActions {
 
@@ -35,70 +35,73 @@ public class LoginPageActions {
 	 * className, xpath as attributes.
 	 */
 
-	@FindBy(id = "query")
-	public WebElement query;	
-	
+	@FindBy(xpath = "//a[@class='btn__light--ghost login']")
+	public WebElement loginButtonInHomePage;
 
-	public void launchQuikrBazarApplication() {
-		logMessage("The application url is :- " + "https://www.quikr.com");
+	@FindBy(xpath = "//input[@id='email']")
+	public WebElement emailInputField;
+
+	@FindBy(xpath = "//input[@id='password']")
+	public WebElement passwordInputField;
+
+	@FindBy(xpath = "//button[@id='logIn']")
+	public WebElement loginButtonToLogin;
+
+	@FindBy(xpath = "//div[@class='login-error-container']//p")
+	public WebElement errorMessage;
+
+	@FindBy(xpath = "//div[@class='login-error-container']//a[@class='need-help']")
+	public WebElement needHelpLink;
+
+	@FindBy(xpath = "//div[@class='login-error-container']/*[1]")
+	public WebElement questionMarkIcon;
+
+	public void launchHudlApplication() {
+		logMessage("The application url is :- " + "https://www.hudl.com/");
 		logMessage("The test browser is :- " + "Google Chrome");
-		driver.get("https://www.quikr.com");
+		driver.get("https://www.hudl.com/");
 	}
 
-	public boolean verifyQuikrHomePageTitle(String Title) {
+	public String getHudlLoginPageTitle() {
 		logMessage("driver title is=" + driver.getTitle());
-		return driver.getTitle().equals(Title);
-
+		return driver.getTitle();
 	}
 
-	public void searchUsedBeanBagsItemInSearchBox() {
-		query.click();
-		query.sendKeys("bean bags");
+	public void clickLoginButtonFromHomePage() {
+		loginButtonInHomePage.click();
 	}
 
+	public void enterUserName(String Username) {
+		emailInputField.sendKeys(Username);
+	}
+
+	public void enterPassword(String Password) {
+		passwordInputField.sendKeys(Password);
+	}
+
+	public void clickLoginButton() {
+		loginButtonToLogin.click();
+	}
 	
-
-	public WebElement waitForElementToload(WebElement element) {
-		WebDriverWait wait = new WebDriverWait(driver, 80);
-		return wait.until(ExpectedConditions.visibilityOf(element));
-
+	public void enterCredentialsAndLogin(String Username, String Password) {
+		enterUserName(Username);
+		enterPassword(Password);
+		clickLoginButton();
 	}
-
-	public void checkListCountForBeanBags() {
-		List<WebElement> beanBagsList = driver
-				.findElements(By.xpath("//*[contains(@class,'commonPad')]/div[@id='resultCont']/section/div"));
-		logMessage("List Size " + beanBagsList.size());
+	
+	public String getErrorMessage() {
+		waitForElementToload(needHelpLink);
+		System.out.println("error message is "+needHelpLink.getText());
+		return needHelpLink.getText();
+	}
+	
+	public WebElement waitForElementToload(WebElement element) {
+		WebDriverWait wait = new WebDriverWait(driver, 10);
+		return wait.until(ExpectedConditions.visibilityOf(element));
 	}
 
 	protected void logMessage(String message) {
-		System.out.println(message);
-	}
-
-//	public void waitUntilAllBeanBagsItemsAreLoadedOnThePage() {
-//		doWaitUntilAllBeanBagsAreLoadedInTheList(loaderProgress, driver);
-//	}
-
-	@SuppressWarnings("unchecked")
-	public void doWaitUntilAllBeanBagsAreLoadedInTheList(final WebElement loader, WebDriver driver) {
-		WebDriverWait wait = new WebDriverWait(driver, 300);
-		@SuppressWarnings("rawtypes")
-		ExpectedCondition elementIsDisplayed = new ExpectedCondition<Boolean>() {
-			public Boolean apply(WebDriver arg0) {
-				try {
-					scrollDownWindow();
-					loader.isDisplayed();
-					return false;
-				} catch (NoSuchElementException e) {
-					System.out.println("NO Such Element Exception Caught");
-					return true;
-				} catch (StaleElementReferenceException f) {
-					System.out.println("Stale Element Reference Exception Caught");
-
-					return true;
-				}
-			}
-		};
-		wait.until(elementIsDisplayed);
+		Reporter.log(message);
 	}
 
 	public void scrollDownWindow() {

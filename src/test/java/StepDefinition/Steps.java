@@ -4,6 +4,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.testng.Assert;
 
 import com.hudl.automation.pageActions.LoginPageActions;
 
@@ -15,39 +16,26 @@ public class Steps {
 
 	WebDriver driver;
 	LoginPageActions tstSessionUserAction;
-	
-//	@Given("^Open the Firefox and launch the application$")
-//	public void open_the_chrome() throws Throwable {
-//		tstSessionUserAction.launchQuikrBazarApplication();
-//	}
 
-	@Given("^Open the Firefox and launch the application$")
-	public void open_the_Firefox_and_launch_the_application() throws Throwable {
+	@Given("^Open the Firefox and launch the hudl application$")
+	public void open_the_Firefox_and_launch_the_hudl_application() throws Throwable {
 		System.setProperty("webdriver.gecko.driver",
 				"C:\\Users\\anmol\\Downloads\\geckodriver-v0.23.0-win64\\geckodriver.exe");
 		driver = new FirefoxDriver();
-		
-//		System.setProperty("webdriver.chrome.driver","C:\\Users\\anmol\\Downloads\\chromedriver_win32\\chromedriver.exe");
-//		WebDriver driver = new ChromeDriver();
 		driver.manage().window().maximize();
-		driver.get("http://demo.guru99.com/v4");
+		tstSessionUserAction = new LoginPageActions(driver);
+		tstSessionUserAction.launchHudlApplication();
 	}
 
-	@When("^Enter the Username and Password$")
-	public void enter_the_Username_and_Password() throws Throwable {
-		driver.findElement(By.name("uid")).sendKeys("username12");
-		driver.findElement(By.name("password")).sendKeys("password12");
+	@When("^I Enter the wrong credentials$")
+	public void i_Enter_the_wrong_credentials() throws Throwable {
+		tstSessionUserAction.clickLoginButtonFromHomePage();
+		tstSessionUserAction.enterCredentialsAndLogin(Username, Password);
 	}
 
-	@When("^Enter the Username User(\\d+)and Password password(\\d+)$")
-	public void enter_the_Username_User_and_Password_password(String username, String password) throws Throwable {
-		driver.findElement(By.name("uid")).sendKeys(username);
-		driver.findElement(By.name("password")).sendKeys(password);
-	}
-
-	@Then("^Reset the credential$")
-	public void Reset_the_credential() throws Throwable {
-		driver.findElement(By.name("btnReset")).click();
+	@Then("^I am not able to login to the application$")
+	public void i_am_not_able_to_login_to_the_application() throws Throwable {
+		Assert.assertTrue(tstSessionUserAction.getErrorMessage().contains("help"));
 		driver.quit();
 	}
 
